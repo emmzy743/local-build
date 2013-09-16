@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="My Local Ant Build">
+	<property environment="env" />
+	<property name="user_home" value="/Users/Srihitha" />
+	<property name="m2_home" value="${user_home}/.m2/repository/org/cargotel" />
+	<property name="mvn_activiti_rest_version" value="0.0.3" />
+	<property name="explorer_version" value="5.13" />
+	<property name="custom_explorer_version" value="0.0.1" />
+	<property name="mvn_activiti_rest_file" value="${m2_home}/cargotel-activiti-rest/${mvn_activiti_rest_version}/cargotel-activiti-rest-${mvn_activiti_rest_version}.jar" />
+	<property name="cargotel_explorer_file" value="${m2_home}/cargotel-activiti-explorer/${custom_explorer_version}/cargotel-activiti-explorer-${custom_explorer_version}.jar" />
+
+	<property name="cargo" value="/Users/Srihitha/git/CargoTelActiviti" />
+	<property name="tomcat_dist" value="/usr/local/apache-tomcat-7.0.42" />
+	<property name="RestStage" value="dist/activiti-rest" />
+	<property name="RestwebInf" value="${RestStage}/WEB-INF" />
+	<property name="RestClasses" value="${RestwebInf}/classes" />
+
+	<property name="xplorerStage" value="dist/activiti-explorer" />
+	<property name="xplorerwebInf" value="${xplorerStage}/WEB-INF" />
+	<property name="xplorerClasses" value="${xplorerwebInf}/classes" />
+	<property name="xplorerVaadinActivitiStyle" value="${xplorerStage}/VAADIN/themes/activiti" />
+
+	<target name="init">
+		<mkdir dir="dist" />
+	</target>
+
+	<target name="clean">
+		<delete dir="dist" />
+	</target>
+
+	<target depends="clean" name="cleanall">
+		<ant antfile="build.xml" dir="${cargo}" target="clean" />
+	</target>
+
+	<target depends="build-project" name="build" />
+
+	<target depends="cleanall,init" name="build-project">
+		<ant antfile="build.xml" dir="${cargo}" target="build-wars" />
+	</target>
+	
+	<target name="build-wars-4-aws" description="builds custom cargotel-activiti wars for Dev/Heroku">
+		<antcall target="main-build">
+			<param name="configs-location" value="configs-prod"/>
+			<param name="copy-message" value="prod(AWS)"/>
+		</antcall>
+	</target>
+	<target name="build-wars-4-heroku" description="builds custom cargotel-activiti wars for Prod">
+		<antcall target="main-build">
+			<param name="configs-location" value="configs"/>
+			<param name="copy-message" value="heroku/dev"/>
+		</antcall>
+	</target>
+	
+	<target name="build-wars-4-aws(custom-explorer)" description="(custom-explorer) Dev/Heroku">
+		<antcall target="main-build">
+			<param name="configs-location" value="configs-prod"/>
+			<param name="copy-message" value="prod(AWS)"/>
+			<param name="${substitute}" value="true"/>
+		</antcall>
+	</target>
+	<target name="build-wars-4-heroku(custom-explorer)" description="(custom-explorer) Prod">
+		<antcall target="main-build">
+			<param name="configs-location" value="configs"/>
+			<param name="copy-message" value="heroku/dev"/>
+			<param name="${substitute}" value="true"/>
+		</antcall>
+	</target>
+	
+	<target name="substitute-explorer" if="${substitute}">
+	 	<echo> Substituting default Explorer with the Custom one </echo>
+		<delete file="${xplorerwebInf}/lib/activiti-explorer-${explorer_version}.jar"/>
+		<copy file="${cargo}/jar/cargotel-activiti-explorer-${custom_explorer_version}.jar" todir="${xplorerwebInf}/lib" overwrite="true" />
+		<delete file="${xplorerVaadinActivitiStyle}/styles.css"/>
+		<copy file="${cargo}/configs/activiti-explorer/styles.css" todir="${xplorerVaadinActivitiStyle}" overwrite="true" />
+	</target>
+	
+	<target name="sync-jars" description="sync jars">
+	 	<echo> Sync jars files </echo>
+		<copy file="${mvn_activiti_rest_file}" todir="${cargo}/jar" overwrite="true" />
+		<copy file="${cargotel_explorer_file}" todir="${cargo}/jar" overwrite="true" />
+	</target>
+	
+	<target name="main-build" depends="build-project">
+		<echo> Using configs from ${configs-location}</echo>
+		<unwar src="${cargo}/dist/activiti-rest.war" dest="${RestStage}" />
+		<copy file="${configs-location}/activiti-explorer/activiti-standalone-context.xml" todir="${RestwebInf}" overwrite="true" />
+		<copy file="${configs-location}/activiti-explorer/activiti-ui-context.xml" todir="${RestwebInf}" overwrite="true" />
+		<copy file="${configs-location}/activiti-rest/activiti-context.xml" todir="${RestClasses}" overwrite="true" />
+		<copy file="${configs-location}/activiti-rest/db.properties" todir="${RestClasses}" overwrite="true" />
+		<war basedir="${RestStage}" destfile="${RestStage}.war" update="true" />
+
+		<unwar src="${cargo}/dist/activiti-explorer.war" dest="${xplorerStage}" />
+		<copy file="${configs-location}/activiti-explorer/activiti-standalone-context.xml" todir="${xplorerwebInf}" overwrite="true" />
+		<copy file="${configs-location}/activiti-explorer/activiti-ui-context.xml" todir="${xplorerwebInf}" overwrite="true" />
+		<copy file="${configs-location}/activiti-rest/activiti-context.xml" todir="${xplorerClasses}" overwrite="true" />
+		<copy file="${configs-location}/activiti-rest/db.properties" todir="${xplorerClasses}" overwrite="true" />
+		<antcall target="substitute-explorer"/>
+		<war basedir="${xplorerStage}" destfile="${xplorerStage}.war" update="true" />
+
+		<echo> Deleting stage directory ${RestStage} and ${xplorerStage}</echo>
+		<delete dir="${RestStage}" />
+		<delete dir="${xplorerStage}" />
+
+		<echo> Deleting existing deployed (expanded) resources in Tomcat</echo>
+		<delete dir="${tomcat_dist}/webapps/activiti-rest" />
+		<delete dir="${tomcat_dist}/webapps/activiti-explorer" />
+
+		<echo>Copying WARS for ${copy-message} to local Tomcat </echo>
+		<delete file="${tomcat_dist}/webapps/activiti-rest.war" />
+		<delete file="${tomcat_dist}/webapps/activiti-explorer.war" />
+		<copy file="dist/activiti-rest.war" tofile="${tomcat_dist}/webapps/activiti-rest.war" overwrite="true" />
+		<copy file="dist/activiti-explorer.war" tofile="${tomcat_dist}/webapps/activiti-explorer.war" overwrite="true" />
+	</target>
+
+	<target name="copy-rest-jar" description="copy maven jar">
+		<copy file="${mvn_activiti_rest_file}" todir="${tomcat_dist}/webapps/activiti-rest/WEB-INF/lib" overwrite="true" />
+	</target>
+	<target name="replace-explorer-jar" description="copy maven jar">
+		<delete file="${tomcat_dist}/webapps/activiti-explorer/WEB-INF/lib/activiti-explorer-${explorer_version}.jar" failonerror="false"/>
+		<copy file="${cargotel_explorer_file}" todir="${cargo}/jar" overwrite="true" />
+		<copy file="${cargotel_explorer_file}" todir="${tomcat_dist}/webapps/activiti-explorer/WEB-INF/lib" overwrite="true" />
+	</target>
+</project>
