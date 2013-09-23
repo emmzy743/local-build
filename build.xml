@@ -19,6 +19,9 @@
 	<property name="xplorerwebInf" value="${xplorerStage}/WEB-INF" />
 	<property name="xplorerClasses" value="${xplorerwebInf}/classes" />
 	<property name="xplorerVaadinActivitiStyle" value="${xplorerStage}/VAADIN/themes/activiti" />
+	<property name="xplorerCustomStyle" value="${xplorerStage}/explorer/src/css" />
+	<property name="xplorerDarkThemeStyle" value="${xplorerStage}/libs/ext-2.0.2/resources/css" />
+	<property name="xplorerLogo" value="${xplorerStage}/explorer/src/img/signavio/smoky" />
 
 	<target name="init">
 		<mkdir dir="dist" />
@@ -72,6 +75,9 @@
 		<copy file="${cargo}/jar/cargotel-activiti-explorer-${custom_explorer_version}.jar" todir="${xplorerwebInf}/lib" overwrite="true" />
 		<delete file="${xplorerVaadinActivitiStyle}/styles.css"/>
 		<copy file="${cargo}/configs/activiti-explorer/styles.css" todir="${xplorerVaadinActivitiStyle}" overwrite="true" />
+		<copy file="${cargo}/configs/activiti-explorer/custom-style.css" todir="${xplorerCustomStyle}" overwrite="true" />
+		<copy file="${cargo}/configs/activiti-explorer/xtheme-darkgray.css" todir="${xplorerDarkThemeStyle}" overwrite="true" />
+		<copy file="${cargo}/configs/activiti-explorer/logo.png" todir="${xplorerLogo}" overwrite="true" />
 	</target>
 	
 	<target name="sync-jars" description="sync jars">
