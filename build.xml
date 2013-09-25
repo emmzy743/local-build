@@ -22,6 +22,7 @@
 	<property name="xplorerCustomStyle" value="${xplorerStage}/explorer/src/css" />
 	<property name="xplorerDarkThemeStyle" value="${xplorerStage}/libs/ext-2.0.2/resources/css" />
 	<property name="xplorerLogo" value="${xplorerStage}/explorer/src/img/signavio/smoky" />
+	<property name="stencilSet" value="${xplorerStage}/WEB-INF/classes" />
 
 	<target name="init">
 		<mkdir dir="dist" />
@@ -78,6 +79,7 @@
 		<copy file="${cargo}/configs/activiti-explorer/custom-style.css" todir="${xplorerCustomStyle}" overwrite="true" />
 		<copy file="${cargo}/configs/activiti-explorer/xtheme-darkgray.css" todir="${xplorerDarkThemeStyle}" overwrite="true" />
 		<copy file="${cargo}/configs/activiti-explorer/logo.png" todir="${xplorerLogo}" overwrite="true" />
+		<copy file="${cargo}/configs/activiti-explorer/stencilset.json" todir="${stencilSet}" overwrite="true" />
 	</target>
 	
 	<target name="sync-jars" description="sync jars">
