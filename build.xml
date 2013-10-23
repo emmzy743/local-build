@@ -8,6 +8,8 @@
 	<property name="custom_explorer_version" value="0.0.1" />
 	<property name="mvn_activiti_rest_file" value="${m2_home}/cargotel-activiti-rest/${mvn_activiti_rest_version}/cargotel-activiti-rest-${mvn_activiti_rest_version}.jar" />
 	<property name="cargotel_explorer_file" value="${m2_home}/cargotel-activiti-explorer/${custom_explorer_version}/cargotel-activiti-explorer-${custom_explorer_version}.jar" />
+	<property name="mvn_report_jar_file" value="${m2_home}/birt/java-plugin/0.0.1-SNAPSHOT/java-plugin-0.0.1-SNAPSHOT.jar" />
+	<property name="drools_plugin_file" value="${m2_home}/activiti-drools-plugin/0.0.1-SNAPSHOT/activiti-drools-plugin-0.0.1-SNAPSHOT.jar" />
 
 	<property name="cargo" value="/Users/Srihitha/git/CargoTelActiviti" />
 	<property name="tomcat_dist" value="/usr/local/apache-tomcat-7.0.42" />
@@ -86,6 +88,7 @@
 	 	<echo> Sync jars files </echo>
 		<copy file="${mvn_activiti_rest_file}" todir="${cargo}/jar" overwrite="true" />
 		<copy file="${cargotel_explorer_file}" todir="${cargo}/jar" overwrite="true" />
+		<copy file="${drools_plugin_file}" todir="${cargo}/jar" overwrite="true" />
 	</target>
 	
 	<target name="main-build" depends="build-project">
@@ -122,6 +125,9 @@
 
 	<target name="copy-rest-jar" description="copy maven jar">
 		<copy file="${mvn_activiti_rest_file}" todir="${tomcat_dist}/webapps/activiti-rest/WEB-INF/lib" overwrite="true" />
+	</target>
+	<target name="copy-report-plugin" description="copy report plugin jar">
+		<copy file="${mvn_report_jar_file}" todir="${user_home}/git/report-viewer/WebContent/WEB-INF/lib" overwrite="true" />
 	</target>
 	<target name="replace-explorer-jar" description="copy maven jar">
 		<delete file="${tomcat_dist}/webapps/activiti-explorer/WEB-INF/lib/activiti-explorer-${explorer_version}.jar" failonerror="false"/>
