@@ -10,9 +10,10 @@
 	<property name="cargotel_explorer_file" value="${m2_home}/cargotel-activiti-explorer/${custom_explorer_version}/cargotel-activiti-explorer-${custom_explorer_version}.jar" />
 	<property name="mvn_report_jar_file" value="${m2_home}/birt/java-plugin/0.0.1-SNAPSHOT/java-plugin-0.0.1-SNAPSHOT.jar" />
 	<property name="drools_plugin_file" value="${m2_home}/activiti-drools-plugin/0.0.1-SNAPSHOT/activiti-drools-plugin-0.0.1-SNAPSHOT.jar" />
+	<property name="commons_file" value="${m2_home}/commons/0.0.1-SNAPSHOT/commons-0.0.1-SNAPSHOT.jar" />
 
 	<property name="cargo" value="/Users/Srihitha/git/CargoTelActiviti" />
-	<property name="tomcat_dist" value="/usr/local/apache-tomcat-7.0.42" />
+	<property name="tomcat_dist" value="/Users/Srihitha/MyApps/Tomcat7" />
 	<property name="RestStage" value="dist/activiti-rest" />
 	<property name="RestwebInf" value="${RestStage}/WEB-INF" />
 	<property name="RestClasses" value="${RestwebInf}/classes" />
@@ -89,6 +90,7 @@
 		<copy file="${mvn_activiti_rest_file}" todir="${cargo}/jar" overwrite="true" />
 		<copy file="${cargotel_explorer_file}" todir="${cargo}/jar" overwrite="true" />
 		<copy file="${drools_plugin_file}" todir="${cargo}/jar" overwrite="true" />
+		<copy file="${commons_file}" todir="${cargo}/jar" overwrite="true" />
 	</target>
 	
 	<target name="main-build" depends="build-project">
